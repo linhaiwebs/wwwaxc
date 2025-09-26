@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from urllib.parse import urljoin
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import timedelta
@@ -15,6 +16,18 @@ from ..core.security import verify_password, create_access_token, verify_token
 templates = Jinja2Templates(directory="app/templates")
 
 router = APIRouter()
+
+def get_base_url(request: Request) -> str:
+    """获取正确的基础URL，考虑代理头信息"""
+    # 检查代理头信息
+    forwarded_proto = request.headers.get("X-Forwarded-Proto", "http")
+    forwarded_host = request.headers.get("X-Forwarded-Host") or request.headers.get("Host")
+    
+    if forwarded_host:
+        return f"{forwarded_proto}://{forwarded_host}"
+    
+    # 回退到请求的基础URL
+    return str(request.base_url).rstrip('/')
 
 def get_current_admin_user(request: Request, db: Session = Depends(get_db)):
     token = request.cookies.get("admin_token")
@@ -32,7 +45,8 @@ def get_current_admin_user(request: Request, db: Session = Depends(get_db)):
 async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        response = RedirectResponse(url="login", status_code=302)
+        base_url = get_base_url(request)
+        response = RedirectResponse(url=f"{base_url}/admin/login", status_code=302)
         return response
     
     # 获取统计数据
@@ -83,13 +97,15 @@ async def login(request: Request, username: str = Form(...), password: str = For
         expires_delta=timedelta(hours=24)
     )
     
-    response = RedirectResponse(url="./", status_code=302)
+    base_url = get_base_url(request)
+    response = RedirectResponse(url=f"{base_url}/admin/", status_code=302)
     response.set_cookie(key="admin_token", value=token, httponly=True, max_age=86400)
     return response
 
 @router.get("/logout")
-async def logout():
-    response = RedirectResponse(url="login", status_code=302)
+async def logout(request: Request):
+    base_url = get_base_url(request)
+    response = RedirectResponse(url=f"{base_url}/admin/login", status_code=302)
     response.delete_cookie(key="admin_token")
     return response
 
@@ -97,7 +113,8 @@ async def logout():
 async def conversions_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="login", status_code=302)
+        base_url = get_base_url(request)
+        return RedirectResponse(url=f"{base_url}/admin/login", status_code=302)
     
     conversions = db.query(Conversion).order_by(Conversion.created_at.desc()).all()
     return templates.TemplateResponse("conversions.html", {
@@ -110,7 +127,8 @@ async def conversions_page(request: Request, db: Session = Depends(get_db)):
 async def events_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="login", status_code=302)
+        base_url = get_base_url(request)
+        return RedirectResponse(url=f"{base_url}/admin/login", status_code=302)
     
     events = db.query(Event).order_by(Event.created_at.desc()).limit(100).all()
     return templates.TemplateResponse("events.html", {
@@ -123,7 +141,8 @@ async def events_page(request: Request, db: Session = Depends(get_db)):
 async def conversion_links_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="login", status_code=302)
+        base_url = get_base_url(request)
+        return RedirectResponse(url=f"{base_url}/admin/login", status_code=302)
     
     conversion_links = db.query(ConversionLink).order_by(ConversionLink.created_at.desc()).all()
     return templates.TemplateResponse("conversion_links.html", {

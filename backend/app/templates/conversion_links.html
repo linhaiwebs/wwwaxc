@@ -146,7 +146,7 @@ async function addLink() {
     const weight = parseFloat(document.getElementById('addWeight').value);
     
     try {
-        const response = await fetch('../api/conversions', {
+        const response = await fetch('/api/conversions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ async function updateLink() {
     const weight = parseFloat(document.getElementById('editWeight').value);
     
     try {
-        const response = await fetch(`../api/conversions/${id}`, {
+        const response = await fetch(`/api/conversions/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ async function updateLink() {
 async function deleteLink(id) {
     if (confirm('确定要删除这个转换链接吗？')) {
         try {
-            const response = await fetch(`../api/conversions/${id}`, {
+            const response = await fetch(`/api/conversions/${id}`, {
                 method: 'DELETE'
             });
             
