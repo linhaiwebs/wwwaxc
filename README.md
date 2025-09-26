@@ -168,20 +168,29 @@ npm run dev
 
 ## ⚙️ 环境配置
 
-### 后端环境变量
-创建 `backend/.env` 文件：
+### 环境变量配置
+项目使用统一的环境配置文件。复制 `.env.example` 为 `.env` 并修改配置：
+
+```bash
+cp .env.example .env
+```
+
+编辑 `.env` 文件：
 ```env
+# 后端配置
 SECRET_KEY=your-secret-key-change-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_HOURS=24
 DATABASE_URL=sqlite:///./db.sqlite
-ALLOWED_ORIGINS=["http://localhost:8080", "http://localhost:3000", "http://localhost:5173"]
-```
+ALLOWED_ORIGINS=["https://zbfxa.xyz", "http://localhost:3000"]
 
-### 前端环境变量
-创建 `frontend/.env` 文件：
-```env
-VITE_API_URL=http://localhost:8080
+# 前端配置
+VITE_API_URL=https://zbfxa.xyz
+
+# Docker 配置
+COMPOSE_PROJECT_NAME=ai-stock-diagnosis
+FRONTEND_PORT=3000
+BACKEND_PORT=8000
 ```
 
 ## 📊 使用说明
@@ -189,14 +198,14 @@ VITE_API_URL=http://localhost:8080
 ### 1. 访问控制
 用户访问前端时需要在URL中包含 `gclid` 或 `utm_source` 参数：
 ```
-http://localhost:8080/?gclid=abc123
-http://localhost:8080/?utm_source=google
+https://zbfxa.xyz/?gclid=abc123
+https://zbfxa.xyz/?utm_source=google
 ```
 
 ### 2. 转换链接管理
 使用API创建转换链接：
 ```bash
-curl -X POST "http://localhost:8080/api/conversions" \
+curl -X POST "https://zbfxa.xyz/api/conversions" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -211,6 +220,30 @@ curl -X POST "http://localhost:8080/api/conversions" \
 - 转换记录: `GET /admin/conversions`
 - 事件记录: `GET /admin/events`
 - 统计信息: `GET /admin/stats`
+
+## 🏗️ 宝塔面板部署
+
+### 1. Docker 部署
+```bash
+# 克隆项目
+git clone <repository-url>
+cd ai-stock-diagnosis
+
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件
+
+# 启动 Docker 服务
+docker-compose up -d --build
+```
+
+### 2. 宝塔反向代理配置
+在宝塔面板中配置以下反向代理规则：
+
+**统一代理** (`zbfxa.xyz`)
+- 目标URL: `http://127.0.0.1:8080`
+- 发送域名: `$host`
+- 说明: Nginx 容器会自动将请求分发到前端和后端服务
 
 ## 🔧 开发指南
 
