@@ -42,6 +42,8 @@ services:
       - "80"
     depends_on:
       - backend
+    environment:
+      - VITE_API_URL=
     restart: unless-stopped
     networks:
       - app-network
