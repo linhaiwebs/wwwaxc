@@ -76,15 +76,31 @@ async def login_page(request: Request):
 
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    print(f"🔐 登录尝试: 用户名={username}")
+    
     admin_user = db.query(AdminUser).filter(AdminUser.username == username).first()
     
-    if not admin_user or not verify_password(password, admin_user.hashed_password):
+    if not admin_user:
+        print(f"❌ 用户不存在: {username}")
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "用户名或密码错误"
+        })
+    
+    print(f"✅ 找到用户: {admin_user.username}, 活跃状态: {admin_user.is_active}")
+    
+    password_valid = verify_password(password, admin_user.hashed_password)
+    print(f"🔑 密码验证结果: {password_valid}")
+    
+    if not password_valid:
+        print(f"❌ 密码错误")
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "用户名或密码错误"
         })
     
     if not admin_user.is_active:
+        print(f"❌ 账户已禁用")
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "账户已被禁用"
@@ -96,6 +112,8 @@ async def login(request: Request, username: str = Form(...), password: str = For
         data=token_data,
         expires_delta=timedelta(hours=24)
     )
+    
+    print(f"✅ 登录成功，生成Token")
     
     base_url = get_base_url(request)
     response = RedirectResponse(url=f"{base_url}/admin/", status_code=302)
