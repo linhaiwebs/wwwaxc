@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}仪表板 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">仪表板</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i> 刷新
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_events }}</h4>
+                        <p class="card-text">总事件数</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-activity" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_conversions }}</h4>
+                        <p class="card-text">总转换数</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-arrow-repeat" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_conversion_links }}</h4>
+                        <p class="card-text">转换链接数</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-link-45deg" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ (total_conversions / total_events * 100) | round(2) if total_events > 0 else 0 }}%</h4>
+                        <p class="card-text">转换率</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-percent" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 事件类型统计 -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">事件类型统计</h5>
+            </div>
+            <div class="card-body">
+                {% if event_types %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>事件类型</th>
+                                <th>数量</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event_type, count in event_types %}
+                            <tr>
+                                <td>{{ event_type }}</td>
+                                <td>{{ count }}</td>
+                                <td>{{ (count / total_events * 100) | round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">暂无事件数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近转换记录 -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">最近转换记录</h5>
+                <a href="/admin/conversions-page" class="btn btn-sm btn-outline-primary">查看全部</a>
+            </div>
+            <div class="card-body">
+                {% if recent_conversions %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>输入值</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conversion in recent_conversions %}
+                            <tr>
+                                <td>{{ conversion.input_value[:20] }}{% if conversion.input_value|length > 20 %}...{% endif %}</td>
+                                <td>{{ conversion.created_at.strftime('%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">暂无转换记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}事件记录 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">事件记录</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i> 刷新
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if events %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>事件类型</th>
+                        <th>会话ID</th>
+                        <th>元数据</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.id }}</td>
+                        <td>
+                            <span class="badge bg-primary">{{ event.event_type }}</span>
+                        </td>
+                        <td>
+                            <small class="text-muted font-monospace">{{ event.session_id[:8] }}...</small>
+                        </td>
+                        <td>
+                            {% if event.meta %}
+                            <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#meta-{{ event.id }}">
+                                <i class="bi bi-eye"></i> 查看
+                            </button>
+                            <div class="collapse mt-2" id="meta-{{ event.id }}">
+                                <div class="card card-body">
+                                    <pre class="mb-0"><code>{{ event.meta }}</code></pre>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">无</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ event.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-3">
+            <small class="text-muted">显示最近 100 条记录</small>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-activity" style="font-size: 3rem; color: #6c757d;"></i>
+            <h5 class="mt-3 text-muted">暂无事件记录</h5>
+            <p class="text-muted">当用户在前端进行操作时，事件记录将显示在这里</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

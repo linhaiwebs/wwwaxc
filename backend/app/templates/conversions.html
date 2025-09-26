@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}转换记录 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">转换记录</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i> 刷新
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if conversions %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>输入值</th>
+                        <th>目标URL</th>
+                        <th>会话ID</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conversion in conversions %}
+                    <tr>
+                        <td>{{ conversion.id }}</td>
+                        <td>
+                            <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ conversion.input_value }}">
+                                {{ conversion.input_value }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ conversion.target_url }}" target="_blank" class="text-decoration-none">
+                                <span class="text-truncate d-inline-block" style="max-width: 300px;" title="{{ conversion.target_url }}">
+                                    {{ conversion.target_url }}
+                                </span>
+                                <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <small class="text-muted font-monospace">{{ conversion.session_id[:8] }}...</small>
+                        </td>
+                        <td>{{ conversion.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #6c757d;"></i>
+            <h5 class="mt-3 text-muted">暂无转换记录</h5>
+            <p class="text-muted">当用户进行转换操作时，记录将显示在这里</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
