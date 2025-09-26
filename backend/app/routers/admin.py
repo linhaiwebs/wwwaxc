@@ -32,7 +32,9 @@ def get_current_admin_user(request: Request, db: Session = Depends(get_db)):
 async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="/admin/login", status_code=302)
+        # 使用相对重定向，避免端口号问题
+        response = RedirectResponse(url="login", status_code=302)
+        return response
     
     # 获取统计数据
     total_events = db.query(Event).count()
@@ -82,13 +84,14 @@ async def login(request: Request, username: str = Form(...), password: str = For
         expires_delta=timedelta(hours=24)
     )
     
-    response = RedirectResponse(url="/admin/", status_code=302)
+    # 使用相对重定向，避免端口号问题
+    response = RedirectResponse(url="./", status_code=302)
     response.set_cookie(key="admin_token", value=token, httponly=True, max_age=86400)
     return response
 
 @router.get("/logout")
 async def logout():
-    response = RedirectResponse(url="/admin/login", status_code=302)
+    response = RedirectResponse(url="login", status_code=302)
     response.delete_cookie(key="admin_token")
     return response
 
@@ -96,7 +99,7 @@ async def logout():
 async def conversions_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="/admin/login", status_code=302)
+        return RedirectResponse(url="login", status_code=302)
     
     conversions = db.query(Conversion).order_by(Conversion.created_at.desc()).all()
     return templates.TemplateResponse("conversions.html", {
@@ -109,7 +112,7 @@ async def conversions_page(request: Request, db: Session = Depends(get_db)):
 async def events_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="/admin/login", status_code=302)
+        return RedirectResponse(url="login", status_code=302)
     
     events = db.query(Event).order_by(Event.created_at.desc()).limit(100).all()
     return templates.TemplateResponse("events.html", {
@@ -122,7 +125,7 @@ async def events_page(request: Request, db: Session = Depends(get_db)):
 async def conversion_links_page(request: Request, db: Session = Depends(get_db)):
     admin_user = get_current_admin_user(request, db)
     if not admin_user:
-        return RedirectResponse(url="/admin/login", status_code=302)
+        return RedirectResponse(url="login", status_code=302)
     
     conversion_links = db.query(ConversionLink).order_by(ConversionLink.created_at.desc()).all()
     return templates.TemplateResponse("conversion_links.html", {
