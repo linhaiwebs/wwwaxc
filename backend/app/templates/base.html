@@ -45,32 +45,32 @@
                     {% if admin_user %}
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.url.path == '/admin/' %}active{% endif %}" href="./">
+                            <a class="nav-link {% if request.url.path == '/admin/' %}active{% endif %}" href="/admin/">
                                 <i class="bi bi-speedometer2"></i>
                                 仪表板
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'conversions-page' in request.url.path %}active{% endif %}" href="conversions-page">
+                            <a class="nav-link {% if 'conversions-page' in request.url.path %}active{% endif %}" href="/admin/conversions-page">
                                 <i class="bi bi-arrow-repeat"></i>
                                 转换记录
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'events-page' in request.url.path %}active{% endif %}" href="events-page">
+                            <a class="nav-link {% if 'events-page' in request.url.path %}active{% endif %}" href="/admin/events-page">
                                 <i class="bi bi-activity"></i>
                                 事件记录
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'conversion-links-page' in request.url.path %}active{% endif %}" href="conversion-links-page">
+                            <a class="nav-link {% if 'conversion-links-page' in request.url.path %}active{% endif %}" href="/admin/conversion-links-page">
                                 <i class="bi bi-link-45deg"></i>
                                 转换链接
                             </a>
                         </li>
                         <hr class="text-muted">
                         <li class="nav-item">
-                            <a class="nav-link" href="logout">
+                            <a class="nav-link" href="/admin/logout">
                                 <i class="bi bi-box-arrow-right"></i>
                                 退出登录
                             </a>
