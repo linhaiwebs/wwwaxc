@@ -1,33 +1,19 @@
 version: '3.8'
 
 services:
-  nginx-proxy:
-    image: nginx:alpine
-    container_name: landing-nginx-proxy
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - backend
-      - frontend
-    restart: unless-stopped
-    networks:
-      - app-network
-
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: landing-backend
-    expose:
-      - "8000"
+    container_name: ai-stock-backend
+    ports:
+      - "8000:8000"
     volumes:
       - ./data:/app/data
     environment:
       - DATABASE_URL=sqlite:///./data/db.sqlite
       - SECRET_KEY=your-production-secret-key-change-this
-      - ALLOWED_ORIGINS=["*"]
+      - ALLOWED_ORIGINS=["https://zbfxa.xyz", "http://localhost:3000"]
     restart: unless-stopped
     networks:
       - app-network
@@ -36,13 +22,13 @@ services:
     build:
       context: ./frontend
       dockerfile: ../Dockerfile.frontend
-    container_name: landing-frontend
-    expose:
-      - "80"
+    container_name: ai-stock-frontend
+    ports:
+      - "3000:80"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=
+      - VITE_API_URL=https://zbfxa.xyz
     restart: unless-stopped
     networks:
       - app-network

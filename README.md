@@ -102,7 +102,7 @@
 
 ## 🚀 快速开始
 
-### 使用 Docker（推荐）
+### 使用宝塔面板 Docker 部署（推荐）
 
 1. **克隆项目**
 ```bash
@@ -110,7 +110,16 @@ git clone <repository-url>
 cd landing-page-project
 ```
 
-2. **启动服务**
+2. **配置环境变量**
+```bash
+# 复制并编辑后端环境变量
+cp backend/.env.example backend/.env
+
+# 复制并编辑前端环境变量  
+cp frontend/.env.example frontend/.env
+```
+
+3. **启动 Docker 服务**
 ```bash
 # 构建并启动服务
 docker-compose up -d --build
@@ -122,48 +131,13 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-3. **服务端口**
-- 前端页面: http://localhost:3000
-- 后端API: http://localhost:8000/api/
-- API文档: http://localhost:8000/docs
-- 管理接口: http://localhost:8000/admin/
+4. **服务端口**
+- 前端服务: `localhost:3000`
+- 后端服务: `localhost:8000`
+  - API接口: `localhost:8000/api/`
+  - 管理后台: `localhost:8000/admin/`
+  - API文档: `localhost:8000/docs`
 
-4. **配置反向代理**
-你需要在服务器上配置反向代理（如 Nginx）来统一访问：
-```nginx
-server {
-    listen 80;
-    server_name zbfxa.xyz;
-    
-    # 前端
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-    
-    # 后端 API
-    location /api/ {
-        proxy_pass http://localhost:8000/api/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-    
-    # 后端管理
-    location /admin/ {
-        proxy_pass http://localhost:8000/admin/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-    
-    # 后端文档
-    location /docs {
-        proxy_pass http://localhost:8000/docs;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
 
 ### 开发环境
 
